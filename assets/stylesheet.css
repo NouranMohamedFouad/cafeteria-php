@@ -1,0 +1,13 @@
+
+.container{
+    background: linear-gradient(135deg, #bbbec1 0%, #1e1e1e 100%);
+    color: aliceblue;
+    
+}
+
+.form{
+    background-color: rgba(228, 228, 228, 0.849);
+    color:black;
+    width:80%;
+    margin:0 auto;
+}
