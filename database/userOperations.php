@@ -29,7 +29,7 @@ class User{
         }
     }
     
-    function insert($name,$email, $pass,$room,$ext,$image){
+    function insert($name,$email,$pass,$room,$ext,$image){
         try{
             $conn = connect_to_db();
             if($conn){
@@ -59,5 +59,24 @@ class User{
             echo $e->getMessage();
 
         }
+    }
+
+    function selectData(){
+        $data = [];
+
+        try{
+            $conn  = connect_to_db();
+            if($conn){
+                $select_query = "select * from `users`";
+                $stmt = $conn->prepare($select_query);
+                $res=$stmt->execute();
+                $data = $stmt->fetchAll(PDO::FETCH_NUM);
+            }
+
+        }catch (Exception $e){
+            echo $e->getMessage();
+        }
+        return $data;
+
     }
 };
