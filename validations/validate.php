@@ -28,4 +28,8 @@ function validatePassword($password){
     return preg_match("/^[a-z0-9_]{8}$/", $password);
 }
 
+function validateAlphaOnly($string){
+    return preg_match("/^[a-zA-Z]+$/", $string);
+}
+
 ?>
