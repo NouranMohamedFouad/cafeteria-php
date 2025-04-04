@@ -56,7 +56,7 @@
                 echo "<h1> Error uploading image </h1>";
             }
 
-            $db=new Database();
+            $db=new User();
 
             $db->createTable();
             $id =$db->insert($name,$email,$password,$room,$ext,$imagePath);
