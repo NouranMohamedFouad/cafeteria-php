@@ -1,6 +1,6 @@
 <?php
 
-require_once "../includes/utils.php";
+//require_once "../includes/utils.php";
 require_once "connectionCred.php";
 
 
@@ -11,7 +11,7 @@ function connect_to_db(){
         $pdo = new PDO($dns, DB_USER, DB_PASSWORD);
 
     }catch (PDOException $e){
-        displayError($e->getMessage());
+        echo $e->getMessage();
     }
     return $pdo;
 }
