@@ -141,4 +141,28 @@ class User{
         }
     }
 
+    function deleteUser($id){
+        try{
+                $delete_query = "delete from `users` where `id` = :userid";
+                $stmt=$this->db->prepare($delete_query);
+
+                $stmt->bindParam(':userid', $id, PDO::PARAM_INT);
+
+                $res = $stmt->execute();
+
+                if($res){
+                    $affected_rows = $stmt->rowCount();
+                    if ($affected_rows > 0) 
+                    {
+                        return $affected_rows;
+                    }
+                }
+            return false;
+
+        }catch (Exception $e){
+            echo $e->getMessage();
+        }
+    }
+
+
 };
