@@ -35,7 +35,7 @@
         if($old_data){
             $queryString .= "&old={$old_data}";
         }
-        header("location:../app/addUser.php?{$queryString}");
+        header("location:../app/add_user.php?{$queryString}");
     }
     else {
 
@@ -56,14 +56,15 @@
                 echo "<h1> Error uploading image </h1>";
             }
 
-            $db=new User();
+            $db = User::getInstance();
 
             $db->createTable();
+            
             $id =$db->insert($name,$email,$password,$room,$ext,$imagePath);
 
     
             if($id) {
-                header("location:../app/usersRetrieval.php");
+                header("location:../app/users.php");
             }
             else{
                 echo '<h1 class="mt-5 fw-bold text-danger">Contact Support</h1>';

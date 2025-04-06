@@ -3,11 +3,22 @@
 require_once  "databaseConnection.php";
 
 class User{
+    private static $instance = null;
+    private $db;
     
-    function createTable(){
+    private function __construct() {
+        $this->db = DatabaseConnection::getInstance()->getConnection();
+    }
+    
+    public static function getInstance() {
+        if (self::$instance === null) {
+            self::$instance = new User();
+        }
+        return self::$instance;
+    }
+    
+    public function createTable(){
         try{
-            $conn = connect_to_db();
-
             $create_query = "create table if not exists `users` 
                 (`id` int  auto_increment primary key, 
                 `name` varchar(100) not null, 
@@ -17,7 +28,7 @@ class User{
                 `ext` varchar(30) ,
                 `image` varchar(255) );";
 
-            $stmt = $conn->prepare($create_query);
+            $stmt = $this->db->prepare($create_query);
             $res=$stmt->execute();
 
             $conn = null;
@@ -29,14 +40,12 @@ class User{
         }
     }
     
-    function insert($name,$email,$pass,$room,$ext,$image){
+    public function insert($name,$email,$pass,$room,$ext,$image){
         try{
-            $conn = connect_to_db();
-            if($conn){
                 $inst_query = "insert into `users`(`name`, `email`, `password`, `room`, `ext`, `image`)
                 values(:username, :useremail, :userpass, :userroom, :userext , :userimage); ";
 
-                $stmt = $conn->prepare($inst_query);
+                $stmt = $this->db->prepare($inst_query);
 
                 $stmt->bindParam(':username', $name);
                 $stmt->bindParam(':useremail', $email);
@@ -47,13 +56,12 @@ class User{
 
                 $res=$stmt->execute();
                 if($res){
-                    $inserted_id   = $conn->lastInsertId();
+                    $inserted_id =$this->db->lastInsertId();
                     return $inserted_id;
                 }
 
                 $conn = null;
                 return false;
-            }
 
         }catch (Exception $e){
             echo $e->getMessage();
@@ -61,17 +69,14 @@ class User{
         }
     }
 
-    function selectData(){
+    public function selectData(){
         $data = [];
-
         try{
-            $conn  = connect_to_db();
-            if($conn){
-                $select_query = "select * from `users`";
-                $stmt = $conn->prepare($select_query);
-                $res=$stmt->execute();
-                $data = $stmt->fetchAll(PDO::FETCH_NUM);
-            }
+           
+            $select_query="select * from `users`";
+            $stmt=$this->db->prepare($select_query);
+            $res=$stmt->execute();
+            $data=$stmt->fetchAll(PDO::FETCH_NUM);
 
         }catch (Exception $e){
             echo $e->getMessage();
@@ -79,4 +84,61 @@ class User{
         return $data;
 
     }
+
+    public function selectUserById($id){
+        $data = [];
+        try{
+                $select_query = "select * from `users` where `id` = :userid";
+                $stmt =$this->db->prepare($select_query); 
+                $stmt->bindParam(':userid', $id, PDO::PARAM_INT);
+                $res=$stmt->execute();
+                $data = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        }catch (Exception $e){
+            displayError($e->getMessage());
+        }
+        return $data;
+    }
+
+    public function updateUser($id,$name,$email,$pass,$room,$ext,$image){
+
+        try{
+                $fieldsToUpdate['name'] = $name;
+                $fieldsToUpdate['email'] = $email;
+                $fieldsToUpdate['password'] = $pass;
+                $fieldsToUpdate['room'] = $room;
+                $fieldsToUpdate['ext'] = $ext;
+                $fieldsToUpdate['image'] = $image;
+                
+                $setClause = [];
+                foreach ($fieldsToUpdate as $column => $value) {
+                    $setClause[] = "`$column` = :$column";
+                }
+
+                $update_query = "update `users` set " . implode(", ", $setClause) . " where `id` = :id";
+
+
+                $stmt=$this->db->prepare($update_query);
+                
+                foreach ($fieldsToUpdate as $column => $value) {
+                    $stmt->bindValue(":$column", $value);
+                }
+                $stmt->bindValue(":id", $id, PDO::PARAM_INT);
+
+                $res = $stmt->execute();
+
+                if($res){
+                    $affected_rows = $stmt->rowCount();
+                }
+
+                if($affected_rows){
+                    return $affected_rows;
+                }
+            return false;
+        }catch (Exception $e){
+            echo $e->getMessage();
+
+        }
+    }
+
 };

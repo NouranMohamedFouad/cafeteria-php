@@ -1,6 +1,6 @@
 <?php
 
-function drawTable($header, $tableData, $delete='#', $show="#", $edit='#') {
+function drawTable($header, $tableData, $delete='#', $show="#", $edit='../app/edit_user.php') {
 
     echo '<body style="background-color: rgb(32, 30, 30);"> <div class="table-responsive mt-10">
         <table class="table table-hover table-bordered align-middle">

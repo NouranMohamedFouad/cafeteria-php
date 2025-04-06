@@ -6,7 +6,7 @@
 
 
     $table  =[];
-    $db=new User();
+    $db = User::getInstance();
     $table=$db->selectData();
     if ($table) {
         echo '<h1 class="text-center mt-5 fw-bold text-primary">Users Records</h1>';
