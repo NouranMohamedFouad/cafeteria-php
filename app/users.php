@@ -2,7 +2,7 @@
 <?php
     require_once "../includes/utils.php";
     require_once "../helpers/printData.php";
-    require_once "../database/userOperations.php";
+    require_once "../database/user.php";
 
 
     $table  =[];

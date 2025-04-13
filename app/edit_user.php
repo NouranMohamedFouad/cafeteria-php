@@ -1,6 +1,6 @@
 <?php
 
-    require_once "../database/userOperations.php";
+    require_once "../database/user.php";
 
     $errors=[];
     $old_data=[];
@@ -63,7 +63,7 @@
 
       
 
-        <div class="mb-3">
+        <!-- <div class="mb-3">
             <label class="form-label">Password</label>
             <input type="password" name="password" class="form-control" 
             value='<?php echo isset($old_data["password"]) ? $old_data["password"] : (isset($data["password"]) ? $data["password"] : ""); ?>'
@@ -84,7 +84,7 @@
             <div class="text-danger  font-weight-bold">
             <?php  echo isset($errors["confirm_password"]) ? "{$errors['confirm_password']}" : ""; ?>
          </div>
-        </div>
+        </div> -->
         
 
 

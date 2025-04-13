@@ -19,9 +19,7 @@ function validatePostData($postData){
                 $valid_data[$key] = array_map('trim', $value);
             } else {
                 $valid_data[$key] = trim($value);
-            }
-
-            
+            } 
         }
     }
 
@@ -33,7 +31,7 @@ function validateEmail($email){
 }
 
 function validatePassword($password){
-    return preg_match("/^[a-z0-9_]{8}$/", $password);
+    return preg_match("/^[a-z0-9_]{8,15}$/", $password);
 }
 
 function isPasswordMatch($pass,$confirmPass){

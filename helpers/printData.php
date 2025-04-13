@@ -19,9 +19,8 @@ function drawTable($header, $tableData, $delete='../controllers/delete_user_logi
                 echo "<td><img src='{$field}' width='100' height='100'> </td>";
 
             }
-            else if($index==0 || $index==2 || $index==3 || $index==5){
+            else if($index==0 || $index==2 || $index==3 || $index==5 || $index==7){
                 continue;
-
             }
             else {
                 echo "<td>{$field}</td>";

@@ -2,7 +2,7 @@
 
     require_once "../includes/utils.php";
     require_once "../validations/validateData.php";
-    require_once "../database/userOperations.php";
+    require_once "../database/user.php";
 
     $formDataIssues = validatePostData($_POST);
     $formErrors = $formDataIssues["errors"];

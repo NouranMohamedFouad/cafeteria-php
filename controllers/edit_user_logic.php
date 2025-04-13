@@ -2,7 +2,7 @@
 
     require_once "../includes/utils.php";
     require_once "../validations/validateData.php";
-    require_once "../database/userOperations.php";
+    require_once "../database/user.php";
     session_start();
     $_SESSION['edit_user_id'] = $_POST['id'];
     
@@ -11,12 +11,13 @@
     $oldData= $formDataIssues["valid_data"];
 
 
-    $password = $_POST['password'];
-    $confirm_password = $_POST['confirm_password'];
-    $matched=isPasswordMatch($password,$confirm_password);
-    if(!$matched){
-        $formErrors["confirm_password"]="confirm password didn't match";
-    }
+    $password='';
+    // $password = $_POST['password'];
+    // $confirm_password = $_POST['confirm_password'];
+    // $matched=isPasswordMatch($password,$confirm_password);
+    // if(!$matched){
+    //     $formErrors["confirm_password"]="confirm password didn't match";
+    // }
 
 
     $file_errors = validateUploadedFile($_FILES, ['png', 'jpg', 'jpeg']);
