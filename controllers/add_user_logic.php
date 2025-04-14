@@ -3,6 +3,8 @@
     require_once "../includes/utils.php";
     require_once "../validations/validateData.php";
     require_once "../database/user.php";
+    require_once "../config/cloudinary_config.php";
+
 
     $formDataIssues = validatePostData($_POST);
     $formErrors = $formDataIssues["errors"];
@@ -15,7 +17,6 @@
     if(!$matched){
         $formErrors["confirm_password"]="confirm password didn't match";
     }
-
 
     $file_errors = validateUploadedFile($_FILES, ['png', 'jpg', 'jpeg']);
     $image_errors = $file_errors["errors"];
@@ -45,15 +46,23 @@
             $ext = $_POST['ext'];
 
             $image_name = "{$validImageData['tmp_name']}.{$validImageData['extension']}";
-
             $image_tmp = $_FILES['image']['tmp_name'];
-      
-            $uploaded=move_uploaded_file($image_tmp, "../uploads/" . $image_name);
-            $imagePath = "../uploads/" . $image_name;
-            if($uploaded){
+
+            try {
+                $uploadResponse = $cloudinary->uploadApi()->upload($image_tmp, [
+                    'folder' => 'user_profiles',
+                    'public_id' => pathinfo($image_name, PATHINFO_FILENAME),
+                    'overwrite' => true,
+                    'resource_type' => 'image'
+                ]);
+
+                $imagePath = $uploadResponse['secure_url'];
+
                 echo "<h1> Image uploaded successfully </h1>";
-            }else{
-                echo "<h1> Error uploading image </h1>";
+
+            } catch (Exception $e) {
+                echo "<h1> Error uploading image to Cloudinary: {$e->getMessage()} </h1>";
+                exit;
             }
 
             $db = User::getInstance();

@@ -3,6 +3,8 @@
     require_once "../includes/utils.php";
     require_once "../validations/validateData.php";
     require_once "../database/user.php";
+    require_once "../config/cloudinary_config.php";
+
     session_start();
     $_SESSION['edit_user_id'] = $_POST['id'];
     
@@ -47,20 +49,38 @@
             $room = $_POST['room'];
             $ext = $_POST['ext'];
             $id = $_POST['id'];
-           
 
+            if ($_FILES['image']['tmp_name']) {
 
+                $image_name = "{$validImageData['tmp_name']}.{$validImageData['extension']}";
+                $image_tmp = $_FILES['image']['tmp_name'];
 
-            $image_name = "{$validImageData['tmp_name']}.{$validImageData['extension']}";
+                try {
+                    $uploadResponse = $cloudinary->uploadApi()->upload($image_tmp, [
+                        'folder' => 'user_profiles',
+                        'public_id' => pathinfo($image_name, PATHINFO_FILENAME),
+                        'overwrite' => true,
+                        'resource_type' => 'image'
+                    ]);
 
-            $image_tmp = $_FILES['image']['tmp_name'];
-      
-            $uploaded=move_uploaded_file($image_tmp, "../uploads/" . $image_name);
-            $imagePath = "../uploads/" . $image_name;
-            if($uploaded){
-                echo "<h1> Image uploaded successfully </h1>";
-            }else{
-                echo "<h1> Error uploading image </h1>";
+                    $imagePath = $uploadResponse['secure_url'];
+
+                    echo "<h1> Image uploaded successfully </h1>";
+
+                    if ($oldData['image']) {
+                                                
+                        $old_image_public_id = pathinfo($oldData['image'], PATHINFO_FILENAME);
+                        \Cloudinary\Uploader::destroy('user_profiles/' . $old_image_public_id);
+                    }
+
+                } catch (Exception $e) {
+                    echo "<h1> Error uploading image to Cloudinary: {$e->getMessage()} </h1>";
+                    exit;
+                }
+
+                
+            } else {
+                $imagePath = $oldData['image'];
             }
 
             $db = User::getInstance();
