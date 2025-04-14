@@ -190,4 +190,31 @@ class User{
             return false;
         }
     }
+
+    public function selectUserByEmail($email) {
+        try {
+            $select_query = "SELECT * FROM `users` WHERE `email` = :email";
+            $stmt = $this->db->prepare($select_query);
+            $stmt->bindParam(':email', $email);
+            $stmt->execute();
+            return $stmt->fetch(\PDO::FETCH_ASSOC);
+        } catch (Exception $e) {
+            error_log("Error selecting user by email: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    public function updatePassword($email, $newPassword) {
+        try {
+            $update_query = "UPDATE `users` SET `password` = :newPassword WHERE `email` = :email";
+            $stmt = $this->db->prepare($update_query);
+            $stmt->bindParam(':email', $email);
+            $stmt->bindParam(':newPassword', $newPassword); 
+            $res = $stmt->execute();
+            return $res;
+        } catch (Exception $e) {
+            error_log("Error updating password: " . $e->getMessage());
+            return false;
+        }
+    }
 };
