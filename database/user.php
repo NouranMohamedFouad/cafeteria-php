@@ -172,4 +172,22 @@ class User{
             echo $e->getMessage();
         }
     }
+
+    public function verifyLogin($email, $password) {
+        try {
+            $select_query = "SELECT * FROM `users` WHERE `email` = :email";
+            $stmt = $this->db->prepare($select_query);
+            $stmt->bindParam(':email', $email);
+            $stmt->execute();
+            $user = $stmt->fetch(\PDO::FETCH_ASSOC);
+
+            if ($user && password_verify($password, $user['password'])) {
+                return $user;
+            }
+            return false;
+        } catch (Exception $e) {
+            error_log("Login verification error: " . $e->getMessage());
+            return false;
+        }
+    }
 };
