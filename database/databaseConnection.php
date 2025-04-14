@@ -1,6 +1,9 @@
 <?php
 require_once "../includes/utils.php";
-require_once "connectionCred.php";
+require_once "../includes/EnvManager.php";
+
+// Load environment variables
+EnvManager::load();
 
 class DatabaseConnection {
     private static $instance = null;
@@ -9,9 +12,28 @@ class DatabaseConnection {
     // private constructor to prevent direct instantiation
     private function __construct() {
         try {
-            $dsn = "mysql:host=".DB_HOST.";dbname=".DB_NAME.";port=".DB_PORT.";";
-            $this->connection = new PDO($dsn, DB_USER, DB_PASSWORD);
-            $this->connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            // Build DSN with SSL options
+            $dsn = sprintf(
+                "mysql:host=%s;dbname=%s;port=%s;sslmode=REQUIRED",
+                EnvManager::get('DB_HOST', 'localhost'),
+                EnvManager::get('DB_NAME', 'cafeteria'),
+                EnvManager::get('DB_PORT', '3306')
+            );
+            
+            // SSL options for PDO
+            $options = [
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT => false,
+                PDO::MYSQL_ATTR_SSL_CA => false
+            ];
+            
+            $this->connection = new PDO(
+                $dsn, 
+                EnvManager::get('DB_USER', 'root'),
+                EnvManager::get('DB_PASSWORD', ''),
+                $options
+            );
+            
             $this->initializeDatabase();
         } catch (PDOException $e) {
             displayError($e->getMessage());

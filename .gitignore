@@ -1,3 +1,30 @@
+# Environment files
+.env
+.env.local
+.env.*.local
+
 # Ignore Cloudinary configuration file
 /config
+
+# Dependencies
+/vendor
+composer.lock
+
+# IDE and editor files
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# Cache and logs
+*.log
+*.cache
+
+# Uploaded files
+/uploads/*
+!uploads/.gitkeep
+
+# OS generated files
+.DS_Store
+Thumbs.db
 
