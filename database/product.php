@@ -88,6 +88,25 @@ class ProductDB {
 
     public function deleteProduct($productId) {
         try {
+            // Start a transaction
+            $this->db->beginTransaction();
+            
+            // First check if the product is referenced in any order_items
+            $stmt = $this->db->prepare("SELECT COUNT(*) FROM order_items WHERE product_id = :id");
+            $stmt->bindParam(':id', $productId);
+            $stmt->execute();
+            $count = $stmt->fetchColumn();
+            
+            if ($count > 0) {
+                // Product is in use, update availability instead of deleting
+                $stmt = $this->db->prepare("UPDATE products SET availability = 'unavailable' WHERE id = :id");
+                $stmt->bindParam(':id', $productId);
+                $result = $stmt->execute();
+                $this->db->commit();
+                return $result;
+            }
+            
+            // If not in use, proceed with deletion
             // First get the image path to delete the file
             $stmt = $this->db->prepare("SELECT image_path FROM products WHERE id = :id");
             $stmt->bindParam(':id', $productId);
@@ -105,10 +124,14 @@ class ProductDB {
                     unlink($product['image_path']);
                 }
                 
+                $this->db->commit();
                 return $result;
             }
+            
+            $this->db->commit();
             return false;
         } catch (PDOException $e) {
+            $this->db->rollBack();
             error_log("Error deleting product: " . $e->getMessage());
             return false;
         }

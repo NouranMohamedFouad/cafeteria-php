@@ -39,7 +39,7 @@ if (isset($_GET['delete_id'])) {
             }
             
             $_SESSION['message'] = 'Product deleted successfully';
-            header('Location: products');
+            header('Location: /products');
             exit();
         } else {
             $_SESSION['error'] = 'Failed to delete product';
@@ -48,7 +48,7 @@ if (isset($_GET['delete_id'])) {
         $_SESSION['error'] = 'Product not found';
     }
     
-    header('Location: products');
+    header('Location: /products');
     exit();
 }
 
@@ -188,7 +188,7 @@ $products = $productDB->getAllProductsWithCategories();
             deleteButtons.forEach(button => {
                 button.addEventListener('click', function() {
                     const productId = this.getAttribute('data-id');
-                    confirmDelete.href = `products?delete_id=${productId}`;
+                    confirmDelete.href = `/products?delete_id=${productId}`;
                     deleteModal.show();
                 });
             });

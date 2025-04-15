@@ -29,7 +29,7 @@ function validatePassword($password){
 }
 
 function validateAlphaOnly($string){
-    return preg_match("/^[a-zA-Z]+$/", $string);
+    return preg_match("/^[a-zA-Z ]+$/", $string);
 }
 
 function validateUploadedFile($files, $extensions){
