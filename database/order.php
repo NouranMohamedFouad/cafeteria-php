@@ -153,4 +153,87 @@ class Order {
             return false;
         }
     }
+
+
+    /**
+     * Get all orders for a specific user
+     * 
+     * @param int $userId User ID
+     * @return array Array of orders with their items
+     */
+    public function getUserOrders($userId) {
+        try {
+            // Get all orders for the user
+            $stmt = $this->db->prepare("
+                SELECT o.* 
+                FROM orders o
+                WHERE o.user_id = ?
+                ORDER BY o.created_at DESC
+            ");
+            $stmt->execute([$userId]);
+            $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            
+            // Get items for each order
+            foreach ($orders as &$order) {
+                $stmt = $this->db->prepare("
+                    SELECT oi.*, p.name as product_name, p.image_path
+                    FROM order_items oi
+                    JOIN products p ON oi.product_id = p.id
+                    WHERE oi.order_id = ?
+                ");
+                $stmt->execute([$order['id']]);
+                $order['items'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            }
+            
+            return $orders;
+        } catch (PDOException $e) {
+            error_log("Error getting user orders: " . $e->getMessage());
+            return [];
+        }
+    }
+
+    /**
+     * Get orders for a specific user within a date range
+     * 
+     * @param int $userId User ID
+     * @param string $startDate Start date (YYYY-MM-DD)
+     * @param string $endDate End date (YYYY-MM-DD)
+     * @return array Array of orders with their items
+     */
+    public function getUserOrdersByDateRange($userId, $startDate, $endDate) {
+        try {
+            // Adjust end date to include the entire day
+            $endDate = date('Y-m-d', strtotime($endDate . ' +1 day'));
+            
+            // Get all orders for the user within date range
+            $stmt = $this->db->prepare("
+                SELECT o.* 
+                FROM orders o
+                WHERE o.user_id = ?
+                AND o.created_at >= ?
+                AND o.created_at < ?
+                ORDER BY o.created_at DESC
+            ");
+            $stmt->execute([$userId, $startDate, $endDate]);
+            $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            
+            // Get items for each order
+            foreach ($orders as &$order) {
+                $stmt = $this->db->prepare("
+                    SELECT oi.*, p.name as product_name, p.image_path
+                    FROM order_items oi
+                    JOIN products p ON oi.product_id = p.id
+                    WHERE oi.order_id = ?
+                ");
+                $stmt->execute([$order['id']]);
+                $order['items'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            }
+            
+            return $orders;
+        } catch (PDOException $e) {
+            error_log("Error getting user orders by date range: " . $e->getMessage());
+            return [];
+        }
+    }
+
 }
