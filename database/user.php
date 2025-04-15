@@ -209,6 +209,7 @@ class User{
             $update_query = "UPDATE `users` SET `password` = :newPassword WHERE `email` = :email";
             $stmt = $this->db->prepare($update_query);
             $stmt->bindParam(':email', $email);
+            // Here's the fix - bind the hashed password, not the plain text password
             $stmt->bindParam(':newPassword', $newPassword); 
             $res = $stmt->execute();
             return $res;

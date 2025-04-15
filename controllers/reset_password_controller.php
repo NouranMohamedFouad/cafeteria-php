@@ -36,8 +36,9 @@ class ResetPasswordController {
                 return;
             }
 
-            // Update password
-            $success = $this->userModel->updatePassword($user['id'], $newPassword);
+            // Update password - pass email instead of ID to match the method signature
+            $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
+            $success = $this->userModel->updatePassword($email, $hashedPassword);
             
             if ($success) {
                 $this->redirectWithSuccess('Password has been reset successfully');
