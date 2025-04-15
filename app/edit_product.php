@@ -11,7 +11,7 @@ require_once "../config/cloudinary_config.php";
 
 // session_start();
 // if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
-//     header('Location: login.php');
+//     header('Location: login');
 //     exit();
 // }
 
@@ -28,7 +28,7 @@ $product = $productDB->getProductById($productId);
 
 if (!$product) {
     $_SESSION['error'] = 'Product not found';
-    header('Location: products.php');
+    header('Location: products');
     exit();
 }
 
@@ -86,7 +86,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (empty($errors)) {
         if ($productDB->updateProduct($productId, $name, $price, $category, $availability, $imagePath)) {
             $_SESSION['message'] = 'Product updated successfully';
-            header('Location: products.php');
+            header('Location: products');
             exit();
         } else {
             $errors['general'] = 'Failed to update product';

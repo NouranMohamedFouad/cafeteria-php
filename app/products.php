@@ -10,7 +10,7 @@ require_once "../config/cloudinary_config.php";
 
 // session_start();
 // if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
-//     header('Location: login.php');
+//     header('Location: login');
 //     exit();
 // }
 
@@ -39,7 +39,7 @@ if (isset($_GET['delete_id'])) {
             }
             
             $_SESSION['message'] = 'Product deleted successfully';
-            header('Location: products.php');
+            header('Location: products');
             exit();
         } else {
             $_SESSION['error'] = 'Failed to delete product';
@@ -48,7 +48,7 @@ if (isset($_GET['delete_id'])) {
         $_SESSION['error'] = 'Product not found';
     }
     
-    header('Location: products.php');
+    header('Location: products');
     exit();
 }
 

@@ -13,7 +13,7 @@ require_once "../config/cloudinary_config.php";
 // check if user is admin  ----> may be changed later
 // session_start();
 // if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
-//     header('Location: login.php');
+//     header('Location: login');
 //     exit();
 // }
 
@@ -77,7 +77,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $productDB = ProductDB::getInstance();
             if ($productDB->addProduct($name, $price, $category, $imagePath)) {
                 $_SESSION['message'] = 'Product added successfully';
-                header('Location: products.php');
+                header('Location: products');
                 exit();
             } else {
                 var_dump($productDB);

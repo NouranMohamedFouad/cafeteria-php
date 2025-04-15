@@ -36,9 +36,9 @@ class LoginController {
                 
                 // Redirect based on role
                 if ($user['role'] === 'admin') {
-                    header('Location: ../app/admin_dashboard.php');
+                    header('Location: /home');
                 } else {
-                    header('Location: ../app/user_dashboard.php');
+                    header('Location: /home');
                 }
                 exit();
             } else {
@@ -53,7 +53,7 @@ class LoginController {
     }
 
     private function redirectWithError($error) {
-        header('Location: ../app/login?error=' . urlencode($error));
+        header('Location: /login?error=' . urlencode($error));
         exit();
     }
 }
