@@ -39,20 +39,7 @@ function SelectFromTable($tableName, $columns){
     }
 }
 
-    // Change the status of an order, based on order Id passed to it
-    // The only change that can be made is from processing to canceled
-    // Incomplete function
-    function ChangeOrderStatus($ordeId){
-        try {
-            $conn = ConnectPDO();
-            $query = "update ";
-
-        }
-        catch (Exception $e) {
-            echo "<p style='color: red;'>Error: " . $e->getMessage() . "</p>";
-            return [];
-        }
-    }
+  
 
     // Select orders from the database based on the provided date range
     function FilterOrdersByDate($filter, $Defaultcolumns) {
@@ -99,11 +86,13 @@ function SelectFromTable($tableName, $columns){
         }
     }
     
+    // Helper function to count the retrieved orders for the pagination function
     function CountFilteredOrders($orders)
     {
         return count($orders);
     }
 
+    // Paginate the retrieved orders
     function GetPaginatedOrders($filter, $Defaultcolumns, $limit, $offset) {
         try {
             $conn = ConnectPDO();
@@ -151,6 +140,7 @@ function SelectFromTable($tableName, $columns){
             return [];
         }
     }
+  // Change the status of an order from Processing to Canceled
     function CancelOrder($orderId) {
         if (!is_numeric($orderId) || $orderId <= 0) {
             return "Invalid order ID.";
@@ -173,7 +163,7 @@ function SelectFromTable($tableName, $columns){
     
             if ($order['status'] !== 'Processing') {
                 $conn->rollBack();
-                return "Only orders in 'processing' status can be cancelled.";
+                return "Only orders in 'Processing' status can be cancelled.";
             }
     
             // Update status
@@ -187,6 +177,40 @@ function SelectFromTable($tableName, $columns){
             return "Error cancelling order: " . $e->getMessage();
         }
     }
+    function DeliverOrder($orderId) {
+        if (!is_numeric($orderId) || $orderId <= 0) {
+            return "Invalid order ID.";
+        }
     
-
+        $conn = ConnectPDO();
+    
+        try {
+            $conn->beginTransaction();
+    
+            // Fetch current status
+            $stmt = $conn->prepare("SELECT status FROM orders WHERE order_id = :id FOR UPDATE");
+            $stmt->execute([':id' => $orderId]);
+            $order = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+            if (!$order) {
+                $conn->rollBack();
+                return "Order not found.";
+            }
+    
+            if ($order['status'] !== 'Processing') {
+                $conn->rollBack();
+                return "Only orders in 'processing' status can be delivered.";
+            }
+    
+            // Update status
+            $update = $conn->prepare("UPDATE orders SET status = 'Out for delivery' WHERE order_id = :id");
+            $update->execute([':id' => $orderId]);  
+            $conn->commit();
+            return "Order is out for delivery.";
+    
+        } catch (Exception $e) {
+            $conn->rollBack();
+            return "Error delivering order: " . $e->getMessage();
+        }
+    }
 ?>
