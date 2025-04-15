@@ -18,6 +18,12 @@ require_once "../config/cloudinary_config.php";
 $productDB = ProductDB::getInstance();
 
 $productId = $_GET['id'] ?? 0;
+
+if (!$productId) {
+    header("location:notfound.php"); 
+    exit;
+}
+
 $product = $productDB->getProductById($productId);
 
 if (!$product) {
