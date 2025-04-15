@@ -40,11 +40,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // handle file upload
     $imagePath = null;
     if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
-        $uploadDir = 'uploads/';
+        $uploadDir = '../uploads/';
         $imageName = uniqid() . '_' . basename($_FILES['image']['name']);
         $imagePath = $uploadDir . $imageName;
-        
-        if (!move_uploaded_file($_FILES['image']['tmp_name'], $imagePath)) {
+        $valid_extensions = array("jpeg", "jpg", "png");
+        $ext = pathinfo($_FILES["image"]["name"], PATHINFO_EXTENSION);
+    
+        if (!move_uploaded_file($_FILES['image']['tmp_name'], $imagePath) or ! in_array($ext, $valid_extensions)) {
             $errors['image'] = 'Failed to upload image';
         }
     }
