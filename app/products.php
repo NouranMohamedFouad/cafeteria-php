@@ -66,11 +66,13 @@ $products = $productDB->getAllProductsWithCategories();
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
-<div class="background-overlay"></div>
+    <div class="background-overlay"></div>
+    <?php include '../includes/header.php'; ?>
+
     <div class="container mt-5">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h1>Product Management</h1>
-            <a href="add_product.php" class="btn btn-primary">
+            <a href="add_product" class="btn btn-primary">
                 <i class="fas fa-plus"></i> Add New Product
             </a>
         </div>
@@ -138,7 +140,7 @@ $products = $productDB->getAllProductsWithCategories();
                                             </span>
                                         </td>
                                         <td>
-                                            <a href="edit_product.php?id=<?= $product['id'] ?>" class="btn btn-sm btn-warning mb-2 w-75 btn-secondary">
+                                            <a href="edit_product?id=<?= $product['id'] ?>" class="btn btn-sm btn-warning mb-2 w-75 btn-secondary">
                                                 <i class="fas fa-edit"></i> Edit
                                             </a>
                                             <button class="btn btn-sm btn-danger delete-btn w-75 btn-primary" data-id="<?= $product['id'] ?>">
@@ -174,6 +176,8 @@ $products = $productDB->getAllProductsWithCategories();
         </div>
     </div>
 
+    <?php include '../includes/footer.php'; ?>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -184,7 +188,7 @@ $products = $productDB->getAllProductsWithCategories();
             deleteButtons.forEach(button => {
                 button.addEventListener('click', function() {
                     const productId = this.getAttribute('data-id');
-                    confirmDelete.href = `products.php?delete_id=${productId}`;
+                    confirmDelete.href = `products?delete_id=${productId}`;
                     deleteModal.show();
                 });
             });

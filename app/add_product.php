@@ -112,10 +112,13 @@ $categories = $productDB->getCategories();
 </head>
 <body>
 <div class="background-overlay"></div>
+    
+    <?php include '../includes/header.php'; ?>
+
     <div class="container mt-5">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h1>Add New Product</h1>
-            <a href="products.php" class="btn btn-primary">
+            <a href="products" class="btn btn-primary">
             <i class="fa-solid fa-eye mx-2"></i>Show All Products
             </a>
         </div>
@@ -165,7 +168,7 @@ $categories = $productDB->getCategories();
                                         </option>
                                     <?php endforeach; ?>
                                 </select>
-                                <a href="add_category.php" class="btn btn-outline-secondary">Add Category</a>
+                                <a href="add_category" class="btn btn-outline-secondary">Add Category</a>
                                 <?php if (isset($errors['category'])): ?>
                                     <div class="invalid-feedback"><?= htmlspecialchars($errors['category']) ?></div>
                                 <?php endif; ?>
@@ -197,5 +200,7 @@ $categories = $productDB->getCategories();
             </div>
         </form>
     </div>
+
+    <?php include '../includes/footer.php'; ?>
 </body>
 </html>

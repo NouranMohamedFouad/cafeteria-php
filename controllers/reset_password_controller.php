@@ -51,12 +51,12 @@ class ResetPasswordController {
     }
 
     private function redirectWithError($error) {
-        header('Location: ../app/forgot_password.php?error=' . urlencode($error));
+        header('Location: ../app/forgot_password?error=' . urlencode($error));
         exit();
     }
 
     private function redirectWithSuccess($message) {
-        header('Location: ../app/forgot_password.php?success=' . urlencode($message));
+        header('Location: ../app/forgot_password?success=' . urlencode($message));
         exit();
     }
 }

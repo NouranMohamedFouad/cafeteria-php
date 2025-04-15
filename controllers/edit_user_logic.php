@@ -54,7 +54,7 @@
         if($old_data){
             $queryString .= "&old={$old_data}";
         }
-        header("location:../app/edit_user.php?{$queryString}");
+        header("location:../app/edit_user?{$queryString}");
     }
     else {
 

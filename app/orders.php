@@ -28,13 +28,15 @@ $users = $userDB->selectData();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Order Management | Bean & Crust</title>
+    <title>Order Management | Cafeteria System</title>
+    <link href="../assets/stylesheet.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Raleway:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="../assets/stylesheet.css" rel="stylesheet">
 </head>
 <body>
     <div class="background-overlay"></div>
+    <?php include '../includes/header.php'; ?>
     <div class="container-fluid">
         <div class="row">
             <!-- Main Content Area (75%) -->
@@ -188,6 +190,8 @@ $users = $userDB->selectData();
             </div>
         </div>
     </template>
+
+    <?php include '../includes/footer.php'; ?>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>

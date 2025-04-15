@@ -53,7 +53,7 @@ class LoginController {
     }
 
     private function redirectWithError($error) {
-        header('Location: ../app/login.php?error=' . urlencode($error));
+        header('Location: ../app/login?error=' . urlencode($error));
         exit();
     }
 }

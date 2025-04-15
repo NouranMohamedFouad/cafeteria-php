@@ -53,7 +53,9 @@ if ($selectedUserId) {
     <link href="../assets/stylesheet.css" rel="stylesheet">
 </head>
 <body>
-    <div class="background-overlay"></div>
+<div class="background-overlay"></div>
+    
+    <?php include '../includes/header.php'; ?>
     <div class="container-fluid">
         <div class="row">
             <div class="col-12 p-4">
@@ -83,7 +85,7 @@ if ($selectedUserId) {
                                         <td><?= htmlspecialchars($user[1]) ?></td>
                                         <td><?= htmlspecialchars($user[4]) ?></td>
                                         <td>
-                                            <a href="checks.php?userId=<?= $user[0] ?>" class="btn btn-primary btn-sm">
+                                            <a href="checks?userId=<?= $user[0] ?>" class="btn btn-primary btn-sm">
                                                 <i class="fas fa-eye me-1"></i> View Orders
                                             </a>
                                         </td>
@@ -100,13 +102,13 @@ if ($selectedUserId) {
                 <div class="card mb-4">
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h3>Orders for <?= htmlspecialchars($selectedUser['name']) ?></h3>
-                        <a href="checks.php" class="btn btn-secondary">
+                        <a href="checks" class="btn btn-secondary">
                             <i class="fas fa-arrow-left me-1"></i> Back to Users
                         </a>
                     </div>
                     <div class="card-body">
                         <!-- Date Range Filter -->
-                        <form action="checks.php" method="GET" class="row mb-4">
+                        <form action="checks" method="GET" class="row mb-4">
                             <input type="hidden" name="userId" value="<?= $selectedUserId ?>">
                             <div class="col-md-4">
                                 <label for="startDate" class="form-label">Start Date</label>
@@ -119,7 +121,7 @@ if ($selectedUserId) {
                             <div class="col-md-4 d-flex align-items-end">
                                 <button type="submit" class="btn btn-primary me-2">Filter</button>
                                 <?php if (!empty($startDate) || !empty($endDate)): ?>
-                                <a href="checks.php?userId=<?= $selectedUserId ?>" class="btn btn-secondary">Clear</a>
+                                <a href="checks?userId=<?= $selectedUserId ?>" class="btn btn-secondary">Clear</a>
                                 <?php endif; ?>
                             </div>
                         </form>
@@ -205,7 +207,7 @@ if ($selectedUserId) {
             </div>
         </div>
     </div>
-    
+    <?php include '../includes/footer.php'; ?>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

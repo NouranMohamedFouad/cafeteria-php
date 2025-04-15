@@ -49,7 +49,7 @@
         if($old_data){
             $queryString .= "&old={$old_data}";
         }
-        header("location:../app/add_user.php?{$queryString}");
+        header("location:../app/add_user?{$queryString}");
     }
     else {
 

@@ -6,7 +6,7 @@ require_once '../validations/validate.php';
 
 // session_start();
 // if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
-//     header('Location: login.php');
+//     header('Location: login');
 //     exit();
 // }
 
@@ -36,15 +36,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Add Category</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Raleway:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="../assets/stylesheet.css" rel="stylesheet">
 </head>
 <body>
-    <div class="background-overlay"></div>
+<div class="background-overlay"></div>
+    
+    <?php include '../includes/header.php'; ?>
     <div class="container mt-5">
         <h1 class="mb-4">Add Category</h1>
         
         <?php if ($success): ?>
-            <div class="alert alert-success">Category added successfully! You can now go back to <a href="add_product.php">Add Product</a>.</div>
+            <div class="alert alert-success">Category added successfully! You can now go back to <a href="add_product">Add Product</a>.</div>
         <?php else: ?>
             <?php if (!empty($errors['general'])): ?>
                 <div class="alert alert-danger"><?= htmlspecialchars($errors['general']) ?></div>
@@ -61,12 +65,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
                 
                 <div class="d-flex justify-content-between">
-                    <a href="add_product.php" class="btn btn-secondary">Back</a>
+                    <a href="add_product" class="btn btn-secondary">Back</a>
                     <button type="submit" class="btn btn-primary">Add Category</button>
                 </div>
             </form>
         <?php endif; ?>
     </div>
-
+    <?php include '../includes/footer.php'; ?>
 </body>
 </html>
