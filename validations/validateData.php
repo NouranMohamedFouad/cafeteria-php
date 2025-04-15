@@ -64,8 +64,18 @@ function validateUploadedFile($files, $extensions){
     return ["errors" => $errors, "valid_data" => $valid_data];
 }
 
-function isEmailUnique($email, $userInstance) {
-    return !$userInstance->emailExists($email);
+function isEmailUnique($email, $userInstance,$id=null) {
+
+    $existingUser = $userInstance->emailExists($email);
+ 
+    if ($existingUser) {
+        if ($id && $existingUser['id'] == $id) {
+            return true;
+        }
+        return false;
+    }
+
+    return true;
 }
 
 
