@@ -40,7 +40,7 @@
     $ext = $_POST['ext'];
     $id = $_POST['id'];
 
-    if (!isEmailUnique($email,$db)){
+    if (!isEmailUnique($email,$db,$id) ){
         
         $emailError = ["email" => "Email is already taken"];
         $formErrors = array_merge($formErrors, $emailError);
@@ -84,6 +84,24 @@
                 } catch (Exception $e) {
                     echo "<h1> Error uploading image to Cloudinary: {$e->getMessage()} </h1>";
                     exit;
+                }
+
+                $user = $db->selectUserById($id);
+
+
+                if (!empty($user['image']) && strpos($user['image'], 'cloudinary.com') !== false) {
+                    try {
+                        $urlParts = parse_url($user['image']);
+                        $path = explode('/', $urlParts['path']);
+                        
+                        $filenameWithExt = end($path);
+                        $publicId = 'user_profiles/' . pathinfo($filenameWithExt, PATHINFO_FILENAME);
+                        
+                        $cloudinary->uploadApi()->destroy($publicId);
+                        
+                    } catch (Exception $e) {
+                        error_log("Error deleting image from Cloudinary: " . $e->getMessage());
+                    }
                 }
 
                 

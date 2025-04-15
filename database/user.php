@@ -220,14 +220,12 @@ class User{
 
     public function emailExists($email) {
         try {
-            $query = "select count(*) from users where email = :email";
+            $query = "select * from users where email = :email";
             $stmt = $this->db->prepare($query);
             $stmt->bindParam(':email', $email);
             $stmt->execute();
-            $count = $stmt->fetchColumn();
-            return $count > 0;
+            return $stmt->fetch(PDO::FETCH_ASSOC);
         } catch (Exception $e) {
-            error_log("Error checking email existence: " . $e->getMessage());
             return false;
         }
     }
