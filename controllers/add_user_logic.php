@@ -49,11 +49,9 @@
         if($old_data){
             $queryString .= "&old={$old_data}";
         }
-        header("location:../app/add_user?{$queryString}");
+        header("location: /add_user?{$queryString}");
     }
     else {
-
-           
 
             $image_name = "{$validImageData['tmp_name']}.{$validImageData['extension']}";
             $image_tmp = $_FILES['image']['tmp_name'];
@@ -74,21 +72,15 @@
                 echo "<h1> Error uploading image to Cloudinary: {$e->getMessage()} </h1>";
                 exit;
             }
-
-           
             
             $id =$db->insert($name,$email,$password,$room,$ext,$imagePath);
 
-    
             if($id) {
-                header("location:../app/users.php");
+                header("location: /users");
             }
             else{
                 echo '<h1 class="mt-5 fw-bold text-danger">Contact Support</h1>';
             }  
-            
-            
-
 }
 
 ?>

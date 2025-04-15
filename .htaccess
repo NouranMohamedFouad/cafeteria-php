@@ -14,22 +14,27 @@ Options -Indexes
 </FilesMatch>
 
 # Block access to sensitive directories
-RewriteRule ^(\.git|database|controllers|config|includes|validations|helpers)/ - [F,L]
+# RewriteRule ^(\.git|database|controllers|config|includes|validations|helpers)/$ - [F,L]
+# RewriteRule ^(\.git|database|config|includes|validations|helpers)/([^.]+)$ - [F,L]
+
+# Allow access to controller PHP files directly
+# RewriteCond %{REQUEST_URI} !^/controllers/.*\.php$
 
 # Redirect root to home page
 RewriteRule ^$ app/home.php [L]
 
 # If the file exists with .php extension, use it directly
-RewriteCond %{REQUEST_FILENAME} !-d
+# Make sure query parameters are preserved when rewriting URLs
 RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_FILENAME}.php -f
-RewriteRule ^(.*)$ $1.php [L]
+RewriteRule ^(.*)$ $1.php [QSA,L]
 
 # Remove /app prefix and redirect to the actual file (with .php)
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{DOCUMENT_ROOT}/app/$1.php -f
-RewriteRule ^([^/]+)/?$ app/$1.php [L]
+RewriteRule ^([^/]+)/?$ app/$1.php [QSA,L]
 
 # Handle 404 errors
 ErrorDocument 404 /app/notfound.php

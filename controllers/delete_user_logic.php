@@ -24,5 +24,5 @@
     }
 
     $isDeleted=$db->deleteUser($idToDelete);
-    header("Location:../app/users.php");
+    header("Location: /users");
 ?>

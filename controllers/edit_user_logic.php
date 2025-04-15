@@ -54,7 +54,7 @@
         if($old_data){
             $queryString .= "&old={$old_data}";
         }
-        header("location:../app/edit_user?{$queryString}");
+        header("location: /edit_user?{$queryString}");
     }
     else {
 
@@ -114,7 +114,7 @@
             
     
             if($updated) {
-                header("location:../app/users.php");
+                header("location: /users");
             }
             else{
                 echo '<h1 class="mt-5 fw-bold text-danger">Contact Support</h1>';

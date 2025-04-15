@@ -20,7 +20,7 @@
     session_start();
     $idToUpdate = $_POST['id'] ?? $_SESSION['edit_user_id'] ?? null;
     if($idToUpdate== null){
-        header("location:notfound"); 
+        header("location: /notfound"); 
     }
 
     $data=$db->selectUserById($idToUpdate);

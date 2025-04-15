@@ -20,7 +20,7 @@ $productDB = ProductDB::getInstance();
 $productId = $_GET['id'] ?? 0;
 
 if (!$productId) {
-    header("location:notfound"); 
+    header("location: /notfound"); 
     exit;
 }
 

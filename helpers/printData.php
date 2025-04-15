@@ -1,6 +1,6 @@
 <?php
 
-function drawTable($header, $tableData, $delete='../controllers/delete_user_logic.php', $edit='../app/edit_user.php') {
+function drawTable($header, $tableData, $delete='/controllers/delete_user_logic', $edit='/edit_user') {
 
     global $userHeader;
     $userHeader = $header;
@@ -20,7 +20,7 @@ function drawTable($header, $tableData, $delete='../controllers/delete_user_logi
         <div class="container">
             <div class="header">
                 <h1>User Management</h1>
-                <a href="../app/add_user">
+                <a href="add_user">
                 <button class="btn btn-add">+ ADD NEW USER</button>
                 </a>
             </div>
@@ -49,16 +49,17 @@ function drawTable($header, $tableData, $delete='../controllers/delete_user_logi
                 echo "<td>{$field}</td>";
             }
         }
+        
         echo "<td>
                 <div class='action-buttons'>
                     <form method='post' action='{$edit}'>
-                        <input type='hidden' name='id' value='{$row[0]}'>
+                        <input type='hidden' name='id' value='{$row[1]}'>
                         <input type='submit' class='btn btn-edit' value='Edit'>
                     </form>
 
-                    <form method='post' action='{$delete}' class='delete-form'>
-                        <input type='hidden' name='id' value='{$row[0]}'>
-                        <button type='button' class='btn btn-delete delete-btn' data-id='{$row[0]}'>Delete</button>
+                    <form method='post' action='{$delete}' class='delete-form' id='delete-form-{$row[1]}'>
+                        <input type='hidden' name='id' value='{$row[1]}'>
+                        <button type='button' class='btn btn-delete delete-btn' data-id='{$row[1]}'>Delete</button>
                     </form>
                 </div>
               </td>";
@@ -83,7 +84,7 @@ function drawTable($header, $tableData, $delete='../controllers/delete_user_logi
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <a href="#" id="confirmDelete" class="btn btn-danger">Delete</a>
+                    <button type="button" id="confirmDelete" class="btn btn-danger">Delete</button>
                 </div>
             </div>
         </div>
@@ -91,22 +92,24 @@ function drawTable($header, $tableData, $delete='../controllers/delete_user_logi
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        document.addEventListener(`DOMContentLoaded`, function () {
-            const deleteButtons = document.querySelectorAll(`.delete-btn`);
-            const confirmDeleteBtn = document.getElementById(`confirmDelete`);
-            const deleteModal = new bootstrap.Modal(document.getElementById(`deleteModal`));
+        document.addEventListener("DOMContentLoaded", function() {
+            const deleteButtons = document.querySelectorAll(".delete-btn");
+            const confirmDeleteBtn = document.getElementById("confirmDelete");
+            const deleteModal = new bootstrap.Modal(document.getElementById("deleteModal"));
             let formToSubmit = null;
 
             deleteButtons.forEach(button => {
-                button.addEventListener(`click`, function () {
-                    formToSubmit = this.closest(`form`);
+                button.addEventListener("click", function() {
+                    const userId = this.getAttribute("data-id");
+                    formToSubmit = document.getElementById("delete-form-" + userId);
                     deleteModal.show();
                 });
             });
 
-            confirmDeleteBtn.addEventListener(`click`, function () {
+            confirmDeleteBtn.addEventListener("click", function() {
                 if (formToSubmit) {
                     formToSubmit.submit();
+                    deleteModal.hide();
                 }
             });
         });

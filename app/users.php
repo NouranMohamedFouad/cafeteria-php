@@ -1,3 +1,7 @@
+<div class="background-overlay"></div>
+    
+<?php include '../includes/header.php'; ?>
+
 
 <?php
     require_once "../includes/utils.php";
@@ -19,6 +23,7 @@
 
         $headers = ["Profile","Name","Room no."];
 
+        
         drawTable($headers, $table);
     }
     else{
@@ -26,3 +31,5 @@
     }
     
 ?>
+
+<?php include '../includes/footer.php'; ?>
