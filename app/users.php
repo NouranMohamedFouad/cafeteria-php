@@ -8,9 +8,17 @@
     $table  =[];
     $db = User::getInstance();
     $table=$db->selectData();
+    // var_dump($table);
+    // exit;
     if ($table) {
-        echo '<h1 class="text-center mt-5 fw-bold text-primary">Users Records</h1>';
-        $headers = ["Name","Room no.","Image Path"];
+        foreach ($table as &$row) {
+            $image = $row[6];        
+            unset($row[6]);     
+            array_unshift($row, $image);
+        }
+
+        $headers = ["Profile","Name","Room no."];
+
         drawTable($headers, $table);
     }
     else{
