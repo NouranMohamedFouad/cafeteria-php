@@ -138,10 +138,10 @@ $products = $productDB->getAllProductsWithCategories();
                                             </span>
                                         </td>
                                         <td>
-                                            <a href="edit_product.php?id=<?= $product['id'] ?>" class="btn btn-sm btn-warning mb-2 w-75">
+                                            <a href="edit_product.php?id=<?= $product['id'] ?>" class="btn btn-sm btn-warning mb-2 w-75 btn-secondary">
                                                 <i class="fas fa-edit"></i> Edit
                                             </a>
-                                            <button class="btn btn-sm btn-danger delete-btn w-75" data-id="<?= $product['id'] ?>">
+                                            <button class="btn btn-sm btn-danger delete-btn w-75 btn-primary" data-id="<?= $product['id'] ?>">
                                                 <i class="fas fa-trash"></i> Delete
                                             </button>
                                         </td>
