@@ -7,6 +7,7 @@ require_once '../includes/utils.php';
 require_once '../database/databaseConnection.php';
 require_once '../database/product.php';
 require_once '../validations/validate.php';
+require_once "../config/cloudinary_config.php";
 
 // session_start();
 // if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
@@ -33,29 +34,51 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $errors = [];
 
     // validate inputs
-    if (empty($name)|| !validateAlphaOnly($name)) $errors['name'] = 'Valid product name is required';
+    if (empty($name) || !validateAlphaOnly($name)) $errors['name'] = 'Valid product name is required';
     if (empty($price)) $errors['price'] = 'Price is required';
     if (empty($category)) $errors['category'] = 'Category is required';
 
     // handle file upload
-    $imagePath = null;
+    $imagePath = $product['image_path']; // Keep current image by default
+    
     if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
-        $uploadDir = 'uploads/';
-        $imageName = uniqid() . '_' . basename($_FILES['image']['name']);
-        $imagePath = $uploadDir . $imageName;
-        
-        if (!move_uploaded_file($_FILES['image']['tmp_name'], $imagePath)) {
-            $errors['image'] = 'Failed to upload image';
+        $file_errors = validateUploadedFile($_FILES, ['png', 'jpg', 'jpeg']);
+        $image_errors = $file_errors["errors"];
+        $validImageData = $file_errors["valid_data"];
+        $image_name = "{$validImageData['tmp_name']}.{$validImageData['extension']}";
+        $image_tmp = $_FILES['image']['tmp_name'];
+
+        if (!empty($product['image_path']) && strpos($product['image_path'], 'cloudinary.com') !== false) {
+            try {
+                $urlParts = parse_url($product['image_path']);
+                $path = explode('/', $urlParts['path']);
+                
+                $filenameWithExt = end($path);
+                $publicId = 'product_images/' . pathinfo($filenameWithExt, PATHINFO_FILENAME);
+                
+                $cloudinary->uploadApi()->destroy($publicId);
+                
+            } catch (Exception $e) {
+                error_log("Error deleting image from Cloudinary: " . $e->getMessage());
+            }
+        }
+
+        try {
+            $uploadResponse = $cloudinary->uploadApi()->upload($image_tmp, [
+                'folder' => 'product_images',
+                'public_id' => pathinfo($image_name, PATHINFO_FILENAME),
+                'overwrite' => true,
+                'resource_type' => 'image'
+            ]);
+
+            $imagePath = $uploadResponse['secure_url'];
+        } catch (Exception $e) {
+            $errors['image'] = 'Error uploading image to Cloudinary: ' . $e->getMessage();
         }
     }
 
     if (empty($errors)) {
         if ($productDB->updateProduct($productId, $name, $price, $category, $availability, $imagePath)) {
-            // if a new image was uploaded -> then delete the old one
-            if ($imagePath && file_exists($product['image_path'])) {
-                unlink($product['image_path']);
-            }
-            
             $_SESSION['message'] = 'Product updated successfully';
             header('Location: products.php');
             exit();
@@ -75,12 +98,18 @@ $categories = $productDB->getCategories();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edit Product | Bean & Crust</title>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Raleway:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="../assets/stylesheet.css" rel="stylesheet">
 </head>
 <body>
 <div class="background-overlay"></div>
     <div class="container mt-5">
-        <h1>Edit Product</h1>
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1>Edit Product</h1>
+            <a href="products.php" class="btn btn-primary">
+                <i class="fa-solid fa-eye mx-2"></i>Show All Products
+            </a>
+        </div>
         
         <?php if (!empty($errors['general'])): ?>
             <div class="alert alert-danger"><?= htmlspecialchars($errors['general']) ?></div>
@@ -116,19 +145,22 @@ $categories = $productDB->getCategories();
                         
                         <div class="col-md-6 mb-3">
                             <label for="category" class="form-label">Category</label>
-                            <select class="form-select <?= isset($errors['category']) ? 'is-invalid' : '' ?>" 
-                                    id="category" name="category">
-                                <option value="">Select Category</option>
-                                <?php foreach ($categories as $cat): ?>
-                                    <option value="<?= htmlspecialchars($cat['id']) ?>" 
-                                        <?= ($product['category_id'] == $cat['id']) ? 'selected' : '' ?>>
-                                        <?= htmlspecialchars($cat['name']) ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
-                            <?php if (isset($errors['category'])): ?>
-                                <div class="invalid-feedback"><?= htmlspecialchars($errors['category']) ?></div>
-                            <?php endif; ?>
+                            <div class="input-group">
+                                <select class="form-select <?= isset($errors['category']) ? 'is-invalid' : '' ?>" 
+                                        id="category" name="category">
+                                    <option value="">Select Category</option>
+                                    <?php foreach ($categories as $cat): ?>
+                                        <option value="<?= htmlspecialchars($cat['id']) ?>" 
+                                            <?= ($product['category_id'] == $cat['id']) ? 'selected' : '' ?>>
+                                            <?= htmlspecialchars($cat['name']) ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <a href="add_category.php" class="btn btn-outline-secondary">Add Category</a>
+                                <?php if (isset($errors['category'])): ?>
+                                    <div class="invalid-feedback"><?= htmlspecialchars($errors['category']) ?></div>
+                                <?php endif; ?>
+                            </div>
                         </div>
                     </div>
                     
@@ -172,6 +204,5 @@ $categories = $productDB->getCategories();
             </div>
         </form>
     </div>
-
 </body>
 </html>

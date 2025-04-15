@@ -6,6 +6,7 @@ error_reporting(E_ALL);
 require_once '../includes/utils.php';
 require_once '../database/databaseConnection.php';
 require_once '../database/product.php';
+require_once "../config/cloudinary_config.php";
 
 // session_start();
 // if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
@@ -17,13 +18,38 @@ $productDB = ProductDB::getInstance();
 
 if (isset($_GET['delete_id'])) {
     $productId = $_GET['delete_id'];
-    if ($productDB->deleteProduct($productId)) {
-        $_SESSION['message'] = 'Product deleted successfully';
-        header('Location: products.php');
-        exit();
+    
+    $product = $productDB->getProductById($productId);
+    
+    if ($product) {
+        if ($productDB->deleteProduct($productId)) {
+            if (!empty($product['image_path']) && strpos($product['image_path'], 'cloudinary.com') !== false) {
+                try {
+                    $urlParts = parse_url($product['image_path']);
+                    $path = explode('/', $urlParts['path']);
+                    
+                    $filenameWithExt = end($path);
+                    $publicId = 'product_images/' . pathinfo($filenameWithExt, PATHINFO_FILENAME);
+                    
+                    $cloudinary->uploadApi()->destroy($publicId);
+                    
+                } catch (Exception $e) {
+                    error_log("Error deleting image from Cloudinary: " . $e->getMessage());
+                }
+            }
+            
+            $_SESSION['message'] = 'Product deleted successfully';
+            header('Location: products.php');
+            exit();
+        } else {
+            $_SESSION['error'] = 'Failed to delete product';
+        }
     } else {
-        $_SESSION['error'] = 'Failed to delete product';
+        $_SESSION['error'] = 'Product not found';
     }
+    
+    header('Location: products.php');
+    exit();
 }
 
 $products = $productDB->getAllProductsWithCategories();
@@ -86,16 +112,22 @@ $products = $productDB->getAllProductsWithCategories();
                         <tbody>
                             <?php if (empty($products)): ?>
                                 <tr>
-                                    <td colspan="8" class="text-center">No products found</td>
+                                    <td colspan="7" class="text-center">No products found</td>
                                 </tr>
                             <?php else: ?>
                                 <?php foreach ($products as $product): ?>
                                     <tr>
                                         <td><?= htmlspecialchars($product['id']) ?></td>
                                         <td>
-                                            <img src="<?= $product['image_path'] ?>" 
-                                                 alt="<?= htmlspecialchars($product['name']) ?>" 
-                                                 class="img-thumbnail" style="width: 80px; height: 80px; object-fit: cover;">
+                                            <?php if (!empty($product['image_path'])): ?>
+                                                <img src="<?= htmlspecialchars($product['image_path']) ?>" 
+                                                     alt="<?= htmlspecialchars($product['name']) ?>" 
+                                                     class="img-thumbnail" style="width: 80px; height: 80px; object-fit: cover;">
+                                            <?php else: ?>
+                                                <div class="bg-light text-center p-2" style="width: 80px; height: 80px;">
+                                                    <i class="fas fa-image text-muted" style="font-size: 2rem;"></i>
+                                                </div>
+                                            <?php endif; ?>
                                         </td>
                                         <td><?= htmlspecialchars($product['name']) ?></td>
                                         <td><?= htmlspecialchars($product['price']) ?> EGP</td>
@@ -144,7 +176,6 @@ $products = $productDB->getAllProductsWithCategories();
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Delete confirmation modal
         document.addEventListener('DOMContentLoaded', function() {
             const deleteButtons = document.querySelectorAll('.delete-btn');
             const confirmDelete = document.getElementById('confirmDelete');

@@ -32,4 +32,28 @@ function validateAlphaOnly($string){
     return preg_match("/^[a-zA-Z]+$/", $string);
 }
 
+function validateUploadedFile($files, $extensions){
+
+    $errors = [];
+    $valid_data = [];
+
+    foreach ($files as $file) {
+        if (empty($file['tmp_name'])) {
+            $errors["image"] = ucfirst("Image is required");
+            return ["errors" => $errors, "valid_data" => $valid_data];
+        }else{
+            $tmp_name = explode("/", $file['tmp_name']);
+            $valid_data['tmp_name'] = end($tmp_name);
+        }
+        $extention = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+        if (!in_array($extention, $extensions)) {
+            $errors["image"] = ucfirst("Invalid file extension");
+        }else{
+            $valid_data['extension'] = $extention;
+        }
+    }
+    return ["errors" => $errors, "valid_data" => $valid_data];
+}
+
+
 ?>

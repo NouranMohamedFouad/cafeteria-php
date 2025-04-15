@@ -8,6 +8,7 @@ require_once '../includes/utils.php';
 require_once '../database/databaseConnection.php';
 require_once '../database/product.php';
 require_once '../validations/validate.php';
+require_once "../config/cloudinary_config.php";
 
 // check if user is admin  ----> may be changed later
 // session_start();
@@ -28,18 +29,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (empty($category)) $errors['category'] = 'Category is required';
 
     // Handle file upload
-    $imagePath = '';
-    if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
-        $uploadDir = '../uploads/';
-        $imageName = uniqid() . '_' . basename($_FILES['image']['name']);
-        $imagePath = $uploadDir . $imageName;
+    // $imagePath = '';
+    // if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
+    //     $uploadDir = '../uploads/';
+    //     $imageName = uniqid() . '_' . basename($_FILES['image']['name']);
+    //     $imagePath = $uploadDir . $imageName;
         
-        if (!move_uploaded_file($_FILES['image']['tmp_name'], $imagePath)) {
-            $errors['image'] = 'Failed to upload image';
-        }
-    } else {
-        $errors['image'] = 'Product image is required';
-    }
+    //     if (!move_uploaded_file($_FILES['image']['tmp_name'], $imagePath)) {
+    //         $errors['image'] = 'Failed to upload image';
+    //     }
+    // } else {
+    //     $errors['image'] = 'Product image is required';
+    // }
 
     // $image_name = $_FILES['image']['name'];
     // $imagePath = "../uploads/" . $image_name;
@@ -57,18 +58,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     //     $uploaded=move_uploaded_file($image_tmp, "../uploads/" . $image_name);
     // }
 
+    $file_errors = validateUploadedFile($_FILES, ['png', 'jpg', 'jpeg']);
+    $image_errors = $file_errors["errors"];
+    $validImageData = $file_errors["valid_data"];
+    $image_name = "{$validImageData['tmp_name']}.{$validImageData['extension']}";
+    $image_tmp = $_FILES['image']['tmp_name'];
 
-    if (empty($errors)) {
-        $productDB = ProductDB::getInstance();
-        if ($productDB->addProduct($name, $price, $category, $imagePath)) {
-            $_SESSION['message'] = 'Product added successfully';
-            header('Location: products.php');
-            exit();
-        } else {
-            var_dump($productDB);
-            $errors['general'] = 'Failed to add product';
+    try {
+        $uploadResponse = $cloudinary->uploadApi()->upload($image_tmp, [
+            'folder' => 'product_images',
+            'public_id' => pathinfo($image_name, PATHINFO_FILENAME),
+            'overwrite' => true,
+            'resource_type' => 'image'
+        ]);
+
+        $imagePath = $uploadResponse['secure_url'];
+        if (empty($errors)) {
+            $productDB = ProductDB::getInstance();
+            if ($productDB->addProduct($name, $price, $category, $imagePath)) {
+                $_SESSION['message'] = 'Product added successfully';
+                header('Location: products.php');
+                exit();
+            } else {
+                var_dump($productDB);
+                $errors['general'] = 'Failed to add product';
+            }
         }
+    
+        echo "<h1> Image uploaded successfully </h1>";
+
+    } catch (Exception $e) {
+        echo "<h1> Error uploading image to Cloudinary: {$e->getMessage()} </h1>";
+        exit;
     }
+
+
 }
 
 
