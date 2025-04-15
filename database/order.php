@@ -236,4 +236,45 @@ class Order {
         }
     }
 
+    /**
+     * Get the most recent orders for a specific user
+     * 
+     * @param int $userId User ID
+     * @param int $limit Number of orders to return (default 5)
+     * @return array Array of recent orders with their items
+     */
+    public function getLatestOrdersByUser($userId, $limit = 5) {
+        try {
+            // Get the most recent orders for the user
+            $stmt = $this->db->prepare("
+                SELECT o.* 
+                FROM orders o
+                WHERE o.user_id = :userId
+                ORDER BY o.created_at DESC
+                LIMIT :limit
+            ");
+            $stmt->bindParam(':userId', $userId, PDO::PARAM_INT);
+            $stmt->bindParam(':limit', $limit, PDO::PARAM_INT);
+            $stmt->execute();
+            $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            
+            // Get items for each order
+            foreach ($orders as &$order) {
+                $stmt = $this->db->prepare("
+                    SELECT oi.*, p.name as product_name, p.image_path
+                    FROM order_items oi
+                    JOIN products p ON oi.product_id = p.id
+                    WHERE oi.order_id = ?
+                ");
+                $stmt->execute([$order['id']]);
+                $order['items'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            }
+            
+            return $orders;
+        } catch (PDOException $e) {
+            error_log("Error getting latest user orders: " . $e->getMessage());
+            return [];
+        }
+    }
+
 }
