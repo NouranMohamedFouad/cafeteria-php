@@ -5,6 +5,8 @@
     require_once "../database/user.php";
     require_once "../config/cloudinary_config.php";
 
+    $db = User::getInstance();
+    $db->createTable();
 
     $formDataIssues = validatePostData($_POST);
     $formErrors = $formDataIssues["errors"];
@@ -28,6 +30,17 @@
 
     }
 
+    $name = $_POST['name'];
+    $email = $_POST['email'];
+    $room = $_POST['room'];
+    $ext = $_POST['ext'];
+
+    if (!isEmailUnique($email,$db)){
+        
+        $emailError = ["email" => "Email is already taken"];
+        $formErrors = array_merge($formErrors, $emailError);
+    }
+
 
     if(count($formErrors)) {
         $errors = json_encode($formErrors);
@@ -40,10 +53,7 @@
     }
     else {
 
-            $name = $_POST['name'];
-            $email = $_POST['email'];
-            $room = $_POST['room'];
-            $ext = $_POST['ext'];
+           
 
             $image_name = "{$validImageData['tmp_name']}.{$validImageData['extension']}";
             $image_tmp = $_FILES['image']['tmp_name'];
@@ -65,9 +75,7 @@
                 exit;
             }
 
-            $db = User::getInstance();
-
-            $db->createTable();
+           
             
             $id =$db->insert($name,$email,$password,$room,$ext,$imagePath);
 

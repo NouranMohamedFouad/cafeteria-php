@@ -7,7 +7,10 @@
 
     session_start();
     $_SESSION['edit_user_id'] = $_POST['id'];
-    
+
+    $db = User::getInstance();
+    $db->createTable();
+
     $formDataIssues = validatePostData($_POST);
     $formErrors = $formDataIssues["errors"];
     $oldData= $formDataIssues["valid_data"];
@@ -31,6 +34,17 @@
         $formErrors=array_merge($formErrors, $image_errors);
 
     }
+    $name = $_POST['name'];
+    $email = $_POST['email'];
+    $room = $_POST['room'];
+    $ext = $_POST['ext'];
+    $id = $_POST['id'];
+
+    if (!isEmailUnique($email,$db)){
+        
+        $emailError = ["email" => "Email is already taken"];
+        $formErrors = array_merge($formErrors, $emailError);
+    }
 
 
     if(count($formErrors)) {
@@ -43,12 +57,6 @@
         header("location:../app/edit_user.php?{$queryString}");
     }
     else {
-
-            $name = $_POST['name'];
-            $email = $_POST['email'];
-            $room = $_POST['room'];
-            $ext = $_POST['ext'];
-            $id = $_POST['id'];
 
             if ($_FILES['image']['tmp_name']) {
 
@@ -83,8 +91,7 @@
                 $imagePath = $oldData['image'];
             }
 
-            $db = User::getInstance();
-
+            
             $updated=$db->updateUser($id,$name,$email,$password,$room,$ext,$imagePath,$oldData);
             
     
