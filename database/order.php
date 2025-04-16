@@ -236,6 +236,7 @@ class Order {
         }
     }
 
+
     /**
      * Get the most recent orders for a specific user
      * 
@@ -276,5 +277,29 @@ class Order {
             return [];
         }
     }
+    /**
+     * Get all items for a specific order
+     * 
+     * @param int $orderId Order ID
+     * @return array|false Array of order items if found, false otherwise
+     */
+    public function getOrderItemsByOrderId($orderId) {
+        try {
+            $stmt = $this->db->prepare("
+                SELECT oi.*, p.name as product_name, p.image_path
+                FROM order_items oi
+                JOIN products p ON oi.product_id = p.id
+                WHERE oi.order_id = ?
+            ");
+            $stmt->execute([$orderId]);
+            $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            return $items ?: false;
+        } catch (PDOException $e) {
+            error_log("Error fetching order items: " . $e->getMessage());
+            return false;
+        }
+    }
+
 
 }
